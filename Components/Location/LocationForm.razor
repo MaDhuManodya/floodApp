@@ -1,0 +1,112 @@
+@using FloodApp.Services
+@using FloodApp.State
+@using FloodApp.Models
+@using FloodApp.Components.UI
+@inject LocationService LocationService
+@inject AppState AppState
+@inject NavigationManager Nav
+
+<div class="location-form flex flex-col gap-4">
+    <Panel Class="flex flex-col gap-6">
+        <h2 class="text-xl">Select Location</h2>
+        
+        <!-- Province -->
+        <AppSelect Label="Province" 
+                   Placeholder="Select Province"
+                   Items="@Provinces.Select(p => new AppSelect.SelectOption { Text = p.Name, Value = p.Id })"
+                   SelectedValue="@AppState.SelectedProvinceId"
+                   SelectedValueChanged="@OnProvinceChanged" />
+
+        <!-- District -->
+        <AppSelect Label="District" 
+                   Placeholder="Select District"
+                   Items="@Districts.Select(d => new AppSelect.SelectOption { Text = d.Name, Value = d.Id })"
+                   SelectedValue="@AppState.SelectedDistrictId"
+                   SelectedValueChanged="@OnDistrictChanged" />
+
+        <!-- Town -->
+        <AppSelect Label="Town" 
+                   Placeholder="Select Town"
+                   Items="@Towns.Select(t => new AppSelect.SelectOption { Text = t.Name, Value = t.Id })"
+                   SelectedValue="@AppState.SelectedTownId"
+                   SelectedValueChanged="@OnTownChanged" />
+
+        <div class="flex flex-col gap-3 mt-4">
+            <AppButton Color="AppButton.ButtonColor.Primary" 
+                       Disabled="@(!CanProceed)"
+                       OnClick="@CheckRisk">
+                Check Risk
+            </AppButton>
+            
+            <div class="text-center text-secondary text-sm">OR</div>
+            
+            <AppButton Variant="AppButton.ButtonVariant.Outline" 
+                       Color="AppButton.ButtonColor.Neutral"
+                       OnClick="@(() => Nav.NavigateTo("/choose-on-map"))">
+                Choose on Map    
+            </AppButton>
+        </div>
+    </Panel>
+</div>
+
+@code {
+    private List<Province> Provinces => LocationService.GetProvinces();
+    private List<District> Districts => AppState.SelectedProvinceId.HasValue 
+        ? LocationService.GetDistricts(AppState.SelectedProvinceId.Value) 
+        : new();
+    private List<Town> Towns => AppState.SelectedDistrictId.HasValue 
+        ? LocationService.GetTowns(AppState.SelectedDistrictId.Value) 
+        : new();
+
+    private bool CanProceed => AppState.SelectedTownId.HasValue;
+
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+
+    private void OnProvinceChanged(object? value)
+    {
+        if (value is int id)
+        {
+            var p = Provinces.FirstOrDefault(x => x.Id == id);
+            AppState.SetProvince(id, p?.Coords);
+        }
+        else
+            AppState.SetProvince(null);
+    }
+
+    private void OnDistrictChanged(object? value)
+    {
+        if (value is int id)
+        {
+            var d = Districts.FirstOrDefault(x => x.Id == id);
+            AppState.SetDistrict(id, d?.Coords);
+        }
+        else
+            AppState.SetDistrict(null);
+    }
+
+    private void OnTownChanged(object? value)
+    {
+        if (value is int id)
+        {
+            var town = LocationService.GetTown(id);
+            AppState.SetTown(id, town?.Coords);
+        }
+        else
+        {
+            AppState.SetTown(null, null);
+        }
+    }
+
+    private void CheckRisk()
+    {
+        Nav.NavigateTo("/risk");
+    }
+}

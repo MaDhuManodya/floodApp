@@ -1,0 +1,55 @@
+@using Microsoft.JSInterop
+@using FloodApp.State
+@using FloodApp.Models
+@inject IJSRuntime JS
+@inject AppState AppState
+
+<div id="picker-map" class="h-full w-full"></div>
+
+@code {
+    [Parameter] public EventCallback<LatLng> OnLocationPicked { get; set; }
+
+    private IJSObjectReference? _mapModule;
+    private IJSObjectReference? _mapInstance;
+    private DotNetObjectReference<MapPicker>? _dotNetHelper;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _mapModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/map.js");
+            
+            var center = new { lat = 7.8731, lng = 80.7718 };
+             // Use existing selection if available
+            if (AppState.SelectedLatLng != null)
+            {
+                center = new { lat = AppState.SelectedLatLng.Lat, lng = AppState.SelectedLatLng.Lng };
+            }
+
+            _mapInstance = await _mapModule.InvokeAsync<IJSObjectReference>("initMap", "picker-map", center, 9, null);
+            
+            _dotNetHelper = DotNetObjectReference.Create(this);
+            await _mapModule.InvokeVoidAsync("addClickEvent", _mapInstance, _dotNetHelper);
+
+            if (AppState.SelectedLatLng != null)
+            {
+               await _mapModule.InvokeVoidAsync("addMarker", _mapInstance, AppState.SelectedLatLng.Lat, AppState.SelectedLatLng.Lng);
+            }
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnMapClick(LatLng latLng)
+    {
+        if (_mapModule != null && _mapInstance != null)
+        {
+            await _mapModule.InvokeVoidAsync("addMarker", _mapInstance, latLng.Lat, latLng.Lng);
+            await OnLocationPicked.InvokeAsync(latLng);
+        }
+    }
+
+    public void Dispose()
+    {
+        _dotNetHelper?.Dispose();
+    }
+}

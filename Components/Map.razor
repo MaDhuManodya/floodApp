@@ -1,0 +1,48 @@
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div id="map" style="width: 100%; height: 100%;"></div>
+
+@code {
+    private IJSObjectReference? module;
+    private IJSObjectReference? mapInstance;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./map.js");
+                if (module != null)
+                {
+                    mapInstance = await module.InvokeAsync<IJSObjectReference>("initMap", "map");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error initializing map: {ex.Message}");
+            }
+        }
+    }
+
+    public async Task UpdateView(double lat, double lng, int zoom)
+    {
+        if (module != null && mapInstance != null)
+        {
+            await module.InvokeVoidAsync("updateMap", mapInstance, lat, lng, zoom);
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (mapInstance != null)
+        {
+            await mapInstance.DisposeAsync();
+        }
+        if (module != null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}

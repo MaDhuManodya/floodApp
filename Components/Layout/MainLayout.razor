@@ -1,0 +1,20 @@
+@inherits LayoutComponentBase
+
+<div class="app-layout">
+    <main class="content">
+        @Body
+    </main>
+</div>
+
+<style>
+    .app-layout {
+        min-height: 100vh;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+    }
+    .content {
+        height: 100vh;
+        width: 100%;
+        overflow-x: hidden;
+    }
+</style>

@@ -1,0 +1,73 @@
+@using FloodApp.Services
+@using FloodApp.Models
+@inject WeatherService WeatherService
+
+<div class="weather-widget">
+    <h3 class="text-sm font-bold text-secondary mb-3">Current Conditions</h3>
+    
+    @if (IsLoading)
+    {
+        <div class="flex justify-center p-4">
+            <div class="spinner border-2 border-purple-500 border-t-transparent rounded-full w-6 h-6 animate-spin"></div>
+        </div>
+    }
+    else if (Weather == null)
+    {
+        <div class="text-xs text-red-400 p-2 bg-red-900/20 rounded">
+            Unable to load weather data.
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-3 gap-2 text-center">
+            <!-- Rain -->
+            <div class="bg-gray-800 p-2 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                <span class="text-2xl block mb-1">🌦️</span>
+                <p class="text-xs text-gray-400">Rain</p>
+                <p class="text-sm font-semibold text-white">@Weather.Rain @Weather.UnitRain</p>
+            </div>
+            
+            <!-- Temperature -->
+            <div class="bg-gray-800 p-2 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                <span class="text-2xl block mb-1">
+                    @(Weather.Temperature > 30 ? "☀️" : (Weather.Temperature < 20 ? "❄️" : "cloud"))
+                </span>
+                <p class="text-xs text-gray-400">Temp</p>
+                <p class="text-sm font-semibold text-white">@Weather.Temperature@Weather.UnitTemp</p>
+            </div>
+            
+            <!-- Wind -->
+            <div class="bg-gray-800 p-2 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                <span class="text-2xl block mb-1">💨</span>
+                <p class="text-xs text-gray-400">Wind</p>
+                <p class="text-sm font-semibold text-white">@Weather.WindSpeed @Weather.UnitWind</p>
+            </div>
+        </div>
+        
+        <div class="text-[10px] text-gray-500 mt-2 text-right">
+            Live via Open-Meteo
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public LatLng? Location { get; set; }
+
+    private WeatherResult? Weather;
+    private bool IsLoading = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Location != null)
+        {
+            IsLoading = true;
+            StateHasChanged(); // Force re-render to show spinner
+            
+            // Add a small delay to prevent flickering if API is too fast, and to show off the spinner :D
+            // await Task.Delay(500); 
+            
+            Weather = await WeatherService.GetCurrentWeatherAsync(Location.Lat, Location.Lng);
+            IsLoading = false;
+        }
+    }
+}

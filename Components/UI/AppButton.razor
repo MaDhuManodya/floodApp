@@ -1,0 +1,97 @@
+@namespace FloodApp.Components.UI
+
+<button class="app-btn app-btn-@Variant.ToString().ToLower() app-btn-@Color.ToString().ToLower() @Class" @onclick="OnClick" @attributes="AdditionalAttributes">
+    @if (IsLoading)
+    {
+        <span class="spinner"></span>
+    }
+    else
+    {
+        @if (LeadingIcon != null)
+        {
+            <span class="btn-icon">@LeadingIcon</span>
+        }
+        @ChildContent
+    }
+</button>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? LeadingIcon { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter] public ButtonVariant Variant { get; set; } = ButtonVariant.Filled;
+    [Parameter] public ButtonColor Color { get; set; } = ButtonColor.Primary;
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    public enum ButtonVariant { Filled, Outline, Soft, Ghost }
+    public enum ButtonColor { Primary, Neutral, Success, Danger }
+}
+
+<style>
+    .app-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: 1px solid transparent;
+        line-height: 1.25;
+        outline: none;
+    }
+
+    .app-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .spinner {
+        width: 1em;
+        height: 1em;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.75s linear infinite;
+    }
+    
+    @@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* Variants & Colors */
+    
+    /* Filled */
+    .app-btn-filled.app-btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .app-btn-filled.app-btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+    .app-btn-filled.app-btn-neutral { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-color); }
+    .app-btn-filled.app-btn-neutral:hover { background: var(--border-color); }
+
+    .app-btn-filled.app-btn-success { background: var(--success); color: white; border-color: var(--success); }
+    .app-btn-filled.app-btn-danger { background: var(--danger); color: white; border-color: var(--danger); }
+
+    /* Outline */
+    .app-btn-outline { background: transparent; }
+    .app-btn-outline.app-btn-primary { border-color: var(--accent); color: var(--accent); }
+    .app-btn-outline.app-btn-primary:hover { background: rgba(139, 92, 246, 0.1); }
+    
+    .app-btn-outline.app-btn-neutral { border-color: var(--border-color); color: var(--text-secondary); }
+    .app-btn-outline.app-btn-neutral:hover { border-color: var(--text-primary); color: var(--text-primary); }
+
+    /* Soft */
+    .app-btn-soft.app-btn-primary { background: rgba(139, 92, 246, 0.15); color: #A78BFA; border-color: transparent; }
+    .app-btn-soft.app-btn-primary:hover { background: rgba(139, 92, 246, 0.25); }
+
+    /* Ghost */
+    .app-btn-ghost { background: transparent; border-color: transparent; }
+    .app-btn-ghost.app-btn-primary { color: var(--accent); }
+    .app-btn-ghost.app-btn-primary:hover { background: rgba(139, 92, 246, 0.1); }
+    
+    .app-btn-ghost.app-btn-neutral { color: var(--text-secondary); }
+    .app-btn-ghost.app-btn-neutral:hover { color: var(--text-primary); background: rgba(255,255,255, 0.05); }
+
+</style>

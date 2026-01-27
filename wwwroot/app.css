@@ -1,0 +1,306 @@
+:root {
+    --bg-dark: #111827;
+    --bg-panel: #0f141e;
+    /* Slightly darker/different for contrast */
+    --text-main: #d1d5db;
+    --text-muted: #9ca3af;
+    --accent-purple: #8B5CF6;
+    --accent-purple-dim: #7C3AED;
+    --border-dashed: #7C3AED;
+    --input-bg: #1f2937;
+    --input-border: #374151;
+    --hover-bg: #2d3648;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--accent-purple);
+    margin-top: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Utilities */
+.text-purple {
+    color: var(--accent-purple);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+/* Grid Layout */
+.locations-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .locations-container {
+        flex-direction: row;
+    }
+}
+
+.locations-sidebar {
+    width: 100%;
+    background-color: var(--bg-panel);
+    padding: 2rem;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 768px) {
+    .locations-sidebar {
+        width: 400px;
+        flex-shrink: 0;
+    }
+}
+
+.map-container {
+    flex-grow: 1;
+    background-color: #222;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.landing-hero {
+    height: 100vh;
+    width: 100%;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url('landing-bg.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(to right, #8B5CF6, #3B82F6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.btn-primary {
+    background-color: var(--accent-purple);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.4);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-purple-dim);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px -1px rgba(139, 92, 246, 0.5);
+}
+
+
+
+/* Panel Styling */
+.location-panel {
+    background-color: var(--bg-panel);
+    border: 2px dashed var(--border-dashed);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+    /* Force height for demo consistency */
+}
+
+.panel-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent-purple);
+}
+
+/* Dropdown/Select Styling */
+.app-select-container {
+    position: relative;
+    width: 100%;
+}
+
+.app-select-trigger {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-main);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s;
+    user-select: none;
+}
+
+.app-select-trigger:hover,
+.app-select-trigger.active {
+    border-color: var(--accent-purple);
+}
+
+.app-select-trigger.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #171d29;
+}
+
+.app-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #1f2937;
+    /* Slightly lighter than panel bg */
+    border: 1px solid var(--accent-purple-dim);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    z-index: 50;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-container {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.search-input {
+    width: 100%;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--input-border);
+    color: var(--text-main);
+    padding: 0.5rem;
+    border-radius: 4px;
+    box-sizing: border-box;
+    /* Important so padding doesn't overflow width */
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-purple);
+}
+
+.options-list {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.option-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.option-item:hover,
+.option-item.focused {
+    background-color: var(--hover-bg);
+}
+
+.option-item.selected {
+    border-left: 3px solid var(--accent-purple);
+    background-color: rgba(139, 92, 246, 0.1);
+    color: var(--accent-purple);
+}
+
+/* Selected Values Display (Demo List below dropdown) */
+.selected-values-display {
+    margin-top: 1.5rem;
+    flex-grow: 1;
+    overflow-y: auto;
+    border-top: 1px solid #374151;
+    padding-top: 1rem;
+}
+
+.value-row {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #1f2937;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.value-row.active {
+    color: var(--text-main);
+}

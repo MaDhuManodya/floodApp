@@ -1,0 +1,165 @@
+@namespace FloodApp.Components.UI
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="app-select @Class" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="app-select-label">@Label</label>
+    }
+    
+    <div class="select-wrapper @(IsOpen ? "open" : "")">
+        <button type="button" class="select-trigger" @onclick="ToggleDropdown" @onblur="OnBlur">
+            <span class="selected-text @(SelectedValue == null ? "placeholder" : "")">
+                @(SelectedLabel ?? Placeholder)
+            </span>
+            <span class="select-arrow">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="@(IsOpen ? "rotate-180" : "")">
+                     <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </button>
+
+        @if (IsOpen)
+        {
+            <div class="select-dropdown">
+                @if (Items != null)
+                {
+                    @foreach (var item in Items)
+                    {
+                        <div class="select-item @(Equals(item.Value, SelectedValue) ? "selected" : "")" 
+                             @onmousedown="@(() => SelectItem(item))">
+                            @item.Text
+                        </div>
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public string Placeholder { get; set; } = "Select...";
+    [Parameter] public IEnumerable<SelectOption> Items { get; set; } = Enumerable.Empty<SelectOption>();
+    [Parameter] public object? SelectedValue { get; set; }
+    [Parameter] public EventCallback<object?> SelectedValueChanged { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsOpen { get; set; }
+
+    private string? SelectedLabel => Items?.FirstOrDefault(x => Equals(x.Value, SelectedValue))?.Text;
+
+    private void ToggleDropdown()
+    {
+        IsOpen = !IsOpen;
+    }
+
+    private async Task SelectItem(SelectOption item)
+    {
+        SelectedValue = item.Value;
+        await SelectedValueChanged.InvokeAsync(SelectedValue);
+        IsOpen = false;
+    }
+
+    private async Task OnBlur()
+    {
+        // Small delay to allow SelectItem to fire if clicked
+        await Task.Delay(150);
+        IsOpen = false;
+    }
+
+    public class SelectOption
+    {
+        public string Text { get; set; } = "";
+        public object? Value { get; set; }
+    }
+}
+
+<style>
+    .app-select {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        position: relative;
+    }
+
+    .app-select-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .select-wrapper {
+        position: relative;
+    }
+
+    .select-trigger {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.625rem 1rem;
+        background-color: var(--bg-primary); /* Or darker input bg */
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .select-trigger:hover {
+        border-color: var(--text-secondary);
+    }
+    
+    .select-trigger:focus {
+        border-color: var(--accent);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+    }
+
+    .selected-text.placeholder {
+        color: var(--text-secondary);
+    }
+
+    .select-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: 0.25rem;
+        background-color: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        z-index: 50;
+        max-height: 15rem;
+        overflow-y: auto;
+    }
+
+    .select-item {
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: background-color 0.1s;
+    }
+
+    .select-item:hover {
+        background-color: rgba(139, 92, 246, 0.1);
+    }
+
+    .select-item.selected {
+        background-color: rgba(139, 92, 246, 0.2);
+        color: var(--accent);
+        font-weight: 500;
+    }
+
+    .select-arrow svg {
+        transition: transform 0.2s;
+    }
+    .rotate-180 {
+        transform: rotate(180deg);
+    }
+</style>

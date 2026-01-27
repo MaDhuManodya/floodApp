@@ -1,0 +1,33 @@
+@using Microsoft.JSInterop
+@using FloodApp.Services
+@using FloodApp.State
+@using FloodApp.Models
+@inject IJSRuntime JS
+@inject GeoJsonService GeoJsonService
+@inject AppState AppState
+
+<div id="risk-map" class="h-full w-full"></div>
+
+@code {
+    private IJSObjectReference? _mapModule;
+    private IJSObjectReference? _mapInstance;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && AppState.SelectedLatLng != null)
+        {
+            _mapModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/map.js");
+            
+            var center = new { lat = AppState.SelectedLatLng.Lat, lng = AppState.SelectedLatLng.Lng };
+            _mapInstance = await _mapModule.InvokeAsync<IJSObjectReference>("initMap", "risk-map", center, 13, null);
+            
+            // Add Zones
+            var geoJson = await GeoJsonService.GetRiskZonesGeoJsonAsync();
+            var parsed = System.Text.Json.JsonDocument.Parse(geoJson).RootElement;
+            await _mapModule.InvokeVoidAsync("addGeoJson", _mapInstance, parsed, "defaultStyle");
+            
+            // Add Marker
+            await _mapModule.InvokeVoidAsync("addMarker", _mapInstance, AppState.SelectedLatLng.Lat, AppState.SelectedLatLng.Lng);
+        }
+    }
+}

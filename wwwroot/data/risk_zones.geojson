@@ -1,0 +1,43 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "riskLevel": "High",
+        "description": "Kelani River Flood Zone"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [79.85, 6.95],
+            [79.95, 6.95],
+            [79.95, 6.85],
+            [79.85, 6.85],
+            [79.85, 6.95]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "riskLevel": "Medium",
+        "description": "Gampaha Lowlands"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [79.95, 7.15],
+            [80.05, 7.15],
+            [80.05, 7.05],
+            [79.95, 7.05],
+            [79.95, 7.15]
+          ]
+        ]
+      }
+    }
+  ]
+}

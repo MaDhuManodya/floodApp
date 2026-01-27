@@ -1,0 +1,69 @@
+@page "/ui/buttons"
+@using FloodApp.Components.UI
+@layout FloodApp.Components.Layout.MainLayout
+
+<div class="container p-6">
+    <h1 class="text-2xl mb-6">UI Kit: Buttons</h1>
+
+    <div class="grid gap-8">
+        <!-- Buttons Info -->
+        <Panel>
+            <h2 class="text-xl mb-4">Button Variants</h2>
+            <p class="text-secondary mb-4">Showing all combinations of variants and colors.</p>
+        </Panel>
+
+        <!-- Button Grid -->
+        <div class="grid gap-6 p-6" style="background: white; border-radius: 12px; transform: scale(1);">
+             <!-- Filled -->
+            <div>
+                <h3 class="text-lg text-black mb-4">Button (Filled)</h3>
+                <div class="flex gap-4 flex-wrap">
+                    <AppButton Color="AppButton.ButtonColor.Primary">Primary</AppButton>
+                    <AppButton Color="AppButton.ButtonColor.Neutral">Neutral</AppButton>
+                    <AppButton Color="AppButton.ButtonColor.Success">Success</AppButton>
+                    <AppButton Color="AppButton.ButtonColor.Danger">Danger</AppButton>
+                </div>
+            </div>
+
+             <!-- Outline -->
+            <div>
+                 <h3 class="text-lg text-black mb-4">Button (Outline)</h3>
+                <div class="flex gap-4 flex-wrap">
+                    <AppButton Variant="AppButton.ButtonVariant.Outline" Color="AppButton.ButtonColor.Primary">Primary</AppButton>
+                    <AppButton Variant="AppButton.ButtonVariant.Outline" Color="AppButton.ButtonColor.Neutral">Neutral</AppButton>
+                    <AppButton Variant="AppButton.ButtonVariant.Outline" Color="AppButton.ButtonColor.Success">Success</AppButton>
+                    <AppButton Variant="AppButton.ButtonVariant.Outline" Color="AppButton.ButtonColor.Danger">Danger</AppButton>
+                </div>
+            </div>
+            
+            <!-- Soft -->
+            <div>
+                 <h3 class="text-lg text-black mb-4">Button (Soft)</h3>
+                <div class="flex gap-4 flex-wrap">
+                    <AppButton Variant="AppButton.ButtonVariant.Soft" Color="AppButton.ButtonColor.Primary">Primary</AppButton>
+                    <AppButton Variant="AppButton.ButtonVariant.Soft" Color="AppButton.ButtonColor.Neutral">Neutral</AppButton>
+                    <AppButton Variant="AppButton.ButtonVariant.Soft" Color="AppButton.ButtonColor.Success">Success</AppButton>
+                    <AppButton Variant="AppButton.ButtonVariant.Soft" Color="AppButton.ButtonColor.Danger">Danger</AppButton>
+                </div>
+            </div>
+             
+             <!-- Icons -->
+             <div>
+                <h3 class="text-lg text-black mb-4">With Icons</h3>
+                <div class="flex gap-4 flex-wrap">
+                    <AppButton LeadingIcon="@IconSvg">With Icon</AppButton>
+                    <AppButton Variant="AppButton.ButtonVariant.Outline" LeadingIcon="@IconSvg">Outline Icon</AppButton>
+                </div>
+             </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RenderFragment IconSvg => @<Icon SvgContent='<path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'></Icon>;
+}
+
+<style>
+    /* Override for the white background preview to match screenshot */
+    .text-black { color: #111827; }
+</style>

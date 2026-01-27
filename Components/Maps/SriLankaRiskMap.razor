@@ -1,0 +1,75 @@
+@using Microsoft.JSInterop
+@using FloodApp.Services
+@using FloodApp.State
+@inject IJSRuntime JS
+@inject GeoJsonService GeoJsonService
+@inject AppState AppState
+
+<div id="sl-map" class="h-full w-full z-0"></div>
+
+@code {
+    [Parameter] public EventCallback OnMapReady { get; set; }
+
+    private IJSObjectReference? _mapModule;
+    private IJSObjectReference? _mapInstance;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _mapModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/map.js");
+                
+                // Centered on Sri Lanka
+                var center = new { lat = 7.8731, lng = 80.7718 };
+                _mapInstance = await _mapModule.InvokeAsync<IJSObjectReference>("initMap", "sl-map", center, 8, null); // Zoom 8
+                
+                // Load Zones
+                var geoJson = await GeoJsonService.GetRiskZonesGeoJsonAsync();
+                var parsed = System.Text.Json.JsonDocument.Parse(geoJson).RootElement;
+                await _mapModule.InvokeVoidAsync("addGeoJson", _mapInstance, parsed, "defaultStyle");
+
+                // If user selected a location (e.g. from dropdown), we could zoom to it.
+                // Subscribing to AppState changes to pan map would be good.
+                if (AppState.SelectedLatLng != null)
+                {
+                   await _mapModule.InvokeVoidAsync("addMarker", _mapInstance, AppState.SelectedLatLng.Lat, AppState.SelectedLatLng.Lng);
+                   await _mapModule.InvokeVoidAsync("setView", _mapInstance, AppState.SelectedLatLng.Lat, AppState.SelectedLatLng.Lng, 12);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error initializing map: {ex.Message}");
+            }
+        }
+        else
+        {
+            // Handle updates on subsequent renders
+            if (_mapModule != null && _mapInstance != null)
+            {
+               if (AppState.MapCenter != null)
+               {
+                   await _mapModule.InvokeVoidAsync("setView", _mapInstance, AppState.MapCenter.Lat, AppState.MapCenter.Lng, AppState.MapZoom);
+               }
+               
+               if (AppState.SelectedLatLng != null)
+               {
+                   await _mapModule.InvokeVoidAsync("addMarker", _mapInstance, AppState.SelectedLatLng.Lat, AppState.SelectedLatLng.Lng);
+               }
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+    
+    // Removed OnParametersSetAsync as it is not triggered by AppState changes
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+}

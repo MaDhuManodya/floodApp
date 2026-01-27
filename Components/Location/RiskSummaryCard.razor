@@ -1,0 +1,36 @@
+@using FloodApp.Models
+@using FloodApp.Components.UI
+
+<Panel Class="@($"border-l-4 {BorderColorClass}")">
+    <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+             <div class="w-3 h-3 rounded-full" style="background-color: @Result.ColorCode"></div>
+             <h2 class="text-2xl font-bold" style="color: @Result.ColorCode">@Result.Level Risk</h2>
+        </div>
+        
+        <p class="text-lg text-gray-300">@Result.Message</p>
+        
+        <div class="mt-4 pt-4 border-t border-gray-700">
+            <div class="flex justify-between items-center mb-2">
+                 <span class="text-secondary text-sm">Risk Score</span>
+                 <span class="font-mono text-lg font-bold">@Result.Score.ToString("F1") / 10.0</span>
+            </div>
+            <!-- Progress Bar -->
+            <div class="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full transition-all duration-1000" 
+                     style="width: @(Result.Score * 10)%; background-color: @Result.ColorCode"></div>
+            </div>
+        </div>
+    </div>
+</Panel>
+
+@code {
+    [Parameter] public RiskResult Result { get; set; } = RiskResult.Default;
+    
+    private string BorderColorClass => Result.Level switch {
+        RiskLevel.High => "border-red-500",
+        RiskLevel.Medium => "border-yellow-500",
+        RiskLevel.Low => "border-green-500",
+        _ => "border-gray-500"
+    };
+}

@@ -1,0 +1,173 @@
+@page "/risk"
+@using FloodApp.State
+@using FloodApp.Services
+@using FloodApp.Models
+@using FloodApp.Components.UI
+@using FloodApp.Components.Maps
+@using FloodApp.Components.Location
+@inject NavigationManager Nav
+@inject AppState AppState
+@inject RiskService RiskService
+@layout FloodApp.Components.Layout.MainLayout
+
+<div class="h-screen w-full bg-gray-900 grid" style="grid-template-columns: 400px 1fr;">
+    
+    <!-- Left Panel: Analysis & Info -->
+    <div class="h-full bg-gray-900 border-r border-gray-800 p-6 flex flex-col gap-6 overflow-y-auto z-10 shadow-xl">
+        
+        <div class="flex items-center gap-2 mb-2">
+            <AppButton Variant="AppButton.ButtonVariant.Ghost" 
+                       Color="AppButton.ButtonColor.Neutral"
+                       OnClick="@GoBack">
+                <Icon SvgContent='<path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' />
+                Back
+            </AppButton>
+            <span class="text-secondary">Analysis Result</span>
+        </div>
+
+        @if (IsCalculating)
+        {
+            <div class="flex-1 flex flex-col items-center justify-center gap-4">
+                <div class="spinner border-4 border-purple-500 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
+                <p>Calculating Risk...</p>
+            </div>
+        }
+        else if (AppState.SelectedLatLng == null)
+        {
+             <div class="flex-1 flex items-center justify-center">
+                <AppButton OnClick="@(() => Nav.NavigateTo("/location"))">Select Location</AppButton>
+            </div>
+        }
+        else
+        {
+            <RiskSummaryCard Result="@AppState.CurrentRisk" />
+            
+            <Panel>
+                <h3 class="text-sm font-bold text-secondary mb-2">Recommendations</h3>
+                <ul class="text-sm list-disc pl-4 space-y-2 text-gray-300">
+                    @if (AppState.CurrentRisk.Level == RiskLevel.High)
+                    {
+                        <li>Evacuate to higher ground immediately if water rises.</li>
+                        <li>Keep emergency kit ready.</li>
+                        <li>Follow official DMC alerts.</li>
+                    }
+                    else if (AppState.CurrentRisk.Level == RiskLevel.Medium)
+                    {
+                        <li>Monitor rain levels.</li>
+                        <li>Prepare for potential evacuation.</li>
+                    }
+                    else
+                    {
+                        <li>Area is generally safe from floods.</li>
+                        <li>Stay updated during heavy monsoons.</li>
+                    }
+                </ul>
+            </Panel>
+
+            <!-- Weather Widget (Live) -->
+            <Panel>
+                <WeatherWidget Location="@AppState.SelectedLatLng" />
+            </Panel>
+
+            <!-- Emergency Contacts -->
+            <Panel>
+                <h3 class="text-sm font-bold text-secondary mb-2">Emergency Contacts</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between bg-gray-800 p-2 rounded border border-gray-700">
+                        <div class="flex items-center gap-2">
+                            <span class="text-red-400">🚨</span>
+                            <span class="text-sm text-gray-200">DMC Hotline</span>
+                        </div>
+                        <a href="tel:117" class="text-sm font-bold text-primary hover:text-primary-light">117</a>
+                    </div>
+                    <div class="flex items-center justify-between bg-gray-800 p-2 rounded border border-gray-700">
+                        <div class="flex items-center gap-2">
+                            <span class="text-blue-400">🚓</span>
+                            <span class="text-sm text-gray-200">Police Emergency</span>
+                        </div>
+                        <a href="tel:119" class="text-sm font-bold text-primary hover:text-primary-light">119</a>
+                    </div>
+                    <div class="flex items-center justify-between bg-gray-800 p-2 rounded border border-gray-700">
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400">🚑</span>
+                            <span class="text-sm text-gray-200">Ambulance</span>
+                        </div>
+                        <a href="tel:1990" class="text-sm font-bold text-primary hover:text-primary-light">1990</a>
+                    </div>
+                </div>
+            </Panel>
+
+            <div class="mt-auto">
+                 <AppButton Class="w-full" 
+                            Variant="AppButton.ButtonVariant.Outline"
+                            OnClick="@NewCheck">
+                    Check Another Location
+                </AppButton>
+            </div>
+        }
+    </div>
+
+    <!-- Right Panel: Map -->
+    <div class="h-full relative bg-black overflow-hidden">
+        @if (AppState.SelectedLatLng != null)
+        {
+             <RiskMapView />
+             
+             <!-- Risk Legend Overlay -->
+             <div class="absolute bottom-4 right-4 bg-gray-900/90 backdrop-blur p-4 rounded-lg border border-gray-700 z-[1000]">
+                 <h4 class="text-xs font-bold text-secondary mb-2 uppercase tracking-wider">Risk Zones</h4>
+                 <div class="space-y-2 text-xs">
+                     <div class="flex items-center gap-2">
+                         <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                         <span>High Risk Zone</span>
+                     </div>
+                     <div class="flex items-center gap-2">
+                         <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                         <span>Medium Risk Zone</span>
+                     </div>
+                     <div class="flex items-center gap-2">
+                         <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                         <span>Low/Safe Zone</span>
+                     </div>
+                 </div>
+             </div>
+        }
+        else
+        {
+            <div class="h-full w-full flex items-center justify-center text-gray-500">
+                <p>Select a location to view map.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private bool IsCalculating = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AppState.SelectedLatLng != null)
+        {
+            // Calculate Risk
+            var result = await RiskService.CalculateRiskAsync(AppState.SelectedLatLng);
+            AppState.SetRiskResult(result);
+            IsCalculating = false;
+        }
+        else
+        {
+            IsCalculating = false;
+        }
+    }
+
+    private void GoBack()
+    {
+        Nav.NavigateTo("/location");
+    }
+
+    private void NewCheck()
+    {
+        // Reset state? Or just go back. 
+        // Requirements say "New Check" button.
+        Nav.NavigateTo("/location");
+    }
+}

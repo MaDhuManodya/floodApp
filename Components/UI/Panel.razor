@@ -1,0 +1,21 @@
+@namespace FloodApp.Components.UI
+
+<div class="app-panel @Class" @attributes="AdditionalAttributes">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}
+
+<style>
+    .app-panel {
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 2px dashed var(--accent);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        position: relative;
+    }
+</style>
