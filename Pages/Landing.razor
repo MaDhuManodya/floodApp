@@ -1,107 +1,302 @@
 @page "/"
 @inject NavigationManager Nav
 
-<div class="splash-container" @onclick="@(() => Nav.NavigateTo("/location"))">
-    <div class="content-wrapper">
-        <!-- Logo -->
-        <div class="logo-box">
-            <img src="slic-logo.png" alt="SLIC General" class="splash-logo" />
+<div class="landing-wrapper">
+    <!-- Animated Background -->
+    <div class="bg-gradient"></div>
+    <div class="bg-noise"></div>
+    <div class="floating-blob blob-1"></div>
+    <div class="floating-blob blob-2"></div>
+    <div class="floating-blob blob-3"></div>
+
+    <!-- Main Content -->
+    <div class="glass-card">
+        <div class="logo-container">
+            <img src="slic-logo.png" alt="SLIC General" class="logo-img" />
         </div>
-        
-        <!-- Text -->
-        <h1 class="splash-text">
-            Flood Management System
-            <span class="suffix">SLIC</span>
-        </h1>
-        
-        <div class="click-hint">Click anywhere to enter</div>
-    </div>
-    
-    <!-- Left corner icon similar to mockup -->
-    <div class="corner-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-        </svg>
+
+        <div class="text-content">
+            <h1 class="app-title">Flood Management System</h1>
+            <p class="app-subtitle">SLIC General</p>
+        </div>
+
+        <div class="cta-section">
+            <button class="btn-primary" @onclick="EnterDashboard">
+                Enter Dashboard
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+            <p class="tap-hint">Tap to continue</p>
+        </div>
     </div>
 </div>
 
+@code {
+    private void EnterDashboard()
+    {
+        Nav.NavigateTo("/location");
+    }
+}
+
 <style>
-    .splash-container {
-        height: 100vh;
-        width: 100vw;
-        background-color: #111827;
-        /* Removed background-image to match location page */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        position: relative;
+    :root {
+        --color-navy: #0f172a;
+        --color-teal: #115e59;
+        --color-teal-light: #2dd4bf;
+        --color-white: #ffffff;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        --primary-font: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    .content-wrapper {
+    body {
+        margin: 0;
+        font-family: var(--primary-font);
+        overflow: hidden; /* Prevent scrolling on splash */
+    }
+
+    .landing-wrapper {
+        position: relative;
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: var(--color-navy);
+    }
+
+    /* Background Layers */
+    .bg-gradient {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, #0f172a 0%, #134e4a 100%);
+        z-index: 0;
+    }
+
+    .bg-noise {
+        position: absolute;
+        inset: 0;
+        opacity: 0.03;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .floating-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.4;
+        z-index: 0;
+        animation: float 20s infinite ease-in-out;
+    }
+
+    .blob-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--color-teal);
+        top: -100px;
+        left: -100px;
+        animation-delay: 0s;
+    }
+
+    .blob-2 {
+        width: 300px;
+        height: 300px;
+        background: #0ea5e9; /* Sky blue accent */
+        bottom: -50px;
+        right: -50px;
+        animation-delay: -5s;
+    }
+
+    .blob-3 {
+        width: 200px;
+        height: 200px;
+        background: var(--color-teal-light);
+        top: 40%;
+        left: 60%;
+        animation-delay: -10s;
+        opacity: 0.2;
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+
+    /* Glass Card */
+    .glass-card {
+        position: relative;
+        z-index: 10;
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        border-radius: 24px;
+        padding: 3rem 4rem;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 2rem;
-        animation: fadeIn 1s ease-out;
+        max-width: 90%;
+        width: 450px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: cardFadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    .logo-box {
-        background-color: white;
-        padding: 1rem 2rem;
-        border-radius: 4px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+        border-color: rgba(255, 255, 255, 0.2);
     }
 
-    .splash-logo {
-        max-width: 300px;
+    /* Content Styling */
+    .logo-container {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .glass-card:hover .logo-container {
+        transform: scale(1.02);
+    }
+
+    .logo-img {
+        max-width: 220px;
         height: auto;
         display: block;
     }
 
-    .splash-text {
-        color: white;
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        text-transform: capitalize;
+    .text-content {
         text-align: center;
     }
 
-    .suffix {
-        display: block;
+    .app-title {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--color-white);
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
+
+    .app-subtitle {
+        margin: 0;
         font-size: 1rem;
-        opacity: 0.7;
-        margin-top: 0.25rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.6);
         text-transform: uppercase;
+        letter-spacing: 0.1em;
     }
 
-    .click-hint {
+    /* CTA Section */
+    .cta-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--color-teal) 0%, #0d9488 100%);
+        color: white;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 9999px; /* Pill shape */
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        justify-content: center;
+        outline: none;
+    }
+
+    .btn-primary::after {
+        content: '';
         position: absolute;
-        bottom: 50px;
-        color: rgba(255,255,255,0.3);
-        font-size: 0.9rem;
-        animation: pulse 2s infinite;
+        top: 50%;
+        left: 50%;
+        width: 120%;
+        height: 120%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%) scale(0);
+        border-radius: 50%;
+        transition: transform 0.5s ease;
     }
 
-    .corner-icon {
-        position: absolute;
-        bottom: 30px;
-        left: 30px;
-        color: rgba(255,255,255,0.5);
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        background: linear-gradient(135deg, #115e59 0%, #0f766e 100%);
     }
 
-    /* Animations directly here to ensure they work even if app.css is cached/missing */
-    @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+    .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    }
+    
+    .btn-primary:active::after {
+        transform: translate(-50%, -50%) scale(1);
+        transition: transform 0s;
+    }
+
+    .btn-primary:focus-visible {
+        box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.3);
+    }
+
+    .icon-arrow {
+        transition: transform 0.3s ease;
+    }
+
+    .btn-primary:hover .icon-arrow {
+        transform: translateX(4px);
+    }
+
+    .tap-hint {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.4);
+        margin: 0;
+        animation: pulse 2s infinite ease-in-out;
+    }
+
+    @@keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
     @@keyframes pulse {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 0.6; }
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 0.7; }
+    }
+
+    /* Responsive */
+    @@media (max-width: 640px) {
+        .glass-card {
+            padding: 2rem;
+            width: 100%;
+            margin: 1.5rem;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+        }
     }
 </style>
