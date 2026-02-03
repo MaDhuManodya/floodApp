@@ -1,0 +1,230 @@
+{
+  "appInfo": {
+    "name": "Flood Management System",
+    "purpose": "Intelligent flood risk assessment powered by real-time weather data and advanced analytics for Sri Lanka",
+    "framework": ".NET 8 Blazor Web App (Interactive Server)",
+    "theme": {
+      "uiStyle": "Dark Mode",
+      "primaryColor": "#111827",
+      "accentColor": "Purple/Teal"
+    },
+    "runSteps": [
+      "dotnet restore",
+      "dotnet build",
+      "dotnet run --urls http://localhost:5000"
+    ],
+    "ports": {
+      "dev": 5000,
+      "https": 5001
+    }
+  },
+  "projectStructure": {
+    "folders": {
+      "Pages": "Routable Razor components handling main views (Landing, Location, Risk)",
+      "Components": "Reusable UI blocks (Layout, Maps, Location forms, Buttons)",
+      "Services": "Business logic and data fetching (Weather, Risk, Location)",
+      "Models": "C# record/class definitions for data structures",
+      "State": "AppState class performing client-side state management",
+      "wwwroot": "Static assets: CSS, JS (Leaflet), images (logos), data (GeoJSON)"
+    }
+  },
+  "routesAndPages": [
+    {
+      "route": "/",
+      "pageName": "Landing",
+      "uiSections": [
+        "Splash Container (Dark #111827)",
+        "Centered Logo Box (SLIC General)",
+        "Animated Title Text",
+        "Click-to-Enter Overlay"
+      ],
+      "events": {
+        "onClick": "Navigates to /location"
+      }
+    },
+    {
+      "route": "/location",
+      "pageName": "LocationSelection",
+      "uiSections": [
+        "Left Panel: LocationForm (Province -> District -> Town selection)",
+        "Right Panel: SriLankaRiskMap (Visual map overview)"
+      ],
+      "inputs": {
+        "userSelection": [
+          "Province",
+          "District",
+          "Town"
+        ]
+      },
+      "outputs": {
+        "appState": "Updates SelectedProvinceId, SelectedDistrictId, SelectedTownId, SelectedLatLng",
+        "navigation": "Navigates to /risk on confirmation"
+      }
+    },
+    {
+      "route": "/risk",
+      "pageName": "RiskLocation",
+      "uiSections": [
+        "Left Panel: RiskSummaryCard, WeatherWidget, Recommendations, Emergency Contacts",
+        "Right Panel: RiskMapView, Risk Legend Overlay"
+      ],
+      "inputs": {
+        "source": "AppState.SelectedLatLng"
+      },
+      "outputs": {
+        "riskResult": "Level (High/Medium/Low), Message, Score",
+        "weather": "Temp, Rain, Wind"
+      },
+      "events": {
+        "onInit": "Triggers RiskService.CalculateRiskAsync"
+      }
+    }
+  ],
+  "components": [
+    {
+      "name": "LocationForm",
+      "responsibility": "Handles cascading dropdowns for location selection",
+      "dependencies": [
+        "LocationService",
+        "AppState"
+      ]
+    },
+    {
+      "name": "WeatherWidget",
+      "responsibility": "Displays current weather data",
+      "props": [
+        "Location (LatLng)"
+      ],
+      "dependencies": [
+        "WeatherService"
+      ]
+    },
+    {
+      "name": "RiskMapView",
+      "responsibility": "Renders interactive Leaflet map with current user location marker",
+      "dependencies": [
+        "AppState",
+        "Leaflet JS"
+      ]
+    },
+    {
+      "name": "AppButton",
+      "responsibility": "Standardized button styling",
+      "props": [
+        "Variant",
+        "Color",
+        "OnClick"
+      ]
+    }
+  ],
+  "services": {
+    "WeatherService": {
+      "apiSource": "Open-Meteo API",
+      "endpoint": "https://api.open-meteo.com/v1/forecast",
+      "requestParams": {
+        "latitude": "double",
+        "longitude": "double",
+        "current": "temperature_2m,rain,wind_speed_10m"
+      },
+      "responseModel": "WeatherResult (Temperature, Rain, WindSpeed, Units)",
+      "errorHandling": "Returns null on failure, logs to Console"
+    },
+    "RiskService": {
+      "logic": "Point-in-Polygon (Ray Casting)",
+      "dataSource": "GeoJsonService (risk_zones.geojson)",
+      "output": "RiskResult (Level, Message, ColorCode, Score)",
+      "riskLevels": [
+        {
+          "level": "High",
+          "description": "Evacuation required",
+          "color": "#EF4444"
+        },
+        {
+          "level": "Medium",
+          "description": "prepare for evacuation",
+          "color": "#F59E0B"
+        },
+        {
+          "level": "Low",
+          "description": "Safe",
+          "color": "#10B981"
+        }
+      ]
+    },
+    "LocationService": {
+      "responsibility": "Provides seeded data for Sri Lanka administrative hierarchy",
+      "data": "Hardcoded Lists of Provinces, Districts, Towns with Coordinates",
+      "methods": [
+        "GetProvinces()",
+        "GetDistricts(provinceId)",
+        "GetTowns(districtId)"
+      ]
+    },
+    "GeoJsonService": {
+      "responsibility": "Loads GeoJSON data from wwwroot",
+      "file": "wwwroot/data/risk_zones.geojson"
+    }
+  },
+  "dataAssets": [
+    {
+      "path": "wwwroot/data/risk_zones.geojson",
+      "type": "GeoJSON",
+      "content": "Polygon features with properties: { riskLevel: 'High'/'Medium'/'Low', description: 'Zone Name' }"
+    },
+    {
+      "path": "wwwroot/slic-logo.png",
+      "type": "Image",
+      "use": "Main App Logo"
+    },
+    {
+      "path": "wwwroot/splash-bg.png",
+      "type": "Image",
+      "status": "Unused (replaced by CSS background color)"
+    }
+  ],
+  "stateManagement": {
+    "store": "AppState (Scoped Service)",
+    "lifecycle": "Per-User Session (Server-Side Circuit)",
+    "stateData": {
+      "selection": "SelectedProvinceId, SelectedDistrictId, SelectedTownId",
+      "location": "SelectedLatLng (User's chosen point)",
+      "mapState": "MapCenter, MapZoom",
+      "analysis": "CurrentRisk (Cached result)"
+    },
+    "mechanisms": "Available via Dependency Injection, triggers UI updates via C# Action event (NotifyStateChanged)"
+  },
+  "errorHandling": {
+    "WeatherService": "Try/Catch block, logs error to Console, returns null (UI handles null by showing fallback or empty)",
+    "RiskService": "Fallback safe result if point is not in any known polygon",
+    "UI": "Shows 'Calculating...' spinner during async ops, handles null states gracefully"
+  },
+  "externalDependencies": {
+    "OpenMeteo": "Public Weather API (No Key)",
+    "Leaflet": "JS Maping Library (via wwwroot/js/map.js)",
+    "OpenStreetMap": "Tile Layer for Leaflet"
+  },
+  "examples": {
+    "locationObject": {
+      "id": 1,
+      "name": "Colombo",
+      "coords": {
+        "lat": 6.9271,
+        "lng": 79.8612
+      }
+    },
+    "riskResult": {
+      "level": "Low",
+      "message": "No direct flood risk detected in this zone.",
+      "colorCode": "#10B981",
+      "score": 0.5
+    },
+    "weatherResponse": {
+      "temperature": 28.5,
+      "rain": 0.0,
+      "windSpeed": 12.4,
+      "unitTemp": "°C",
+      "unitRain": "mm",
+      "unitWind": "km/h"
+    }
+  }
+}
