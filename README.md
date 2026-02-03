@@ -57,11 +57,14 @@ An intelligent flood risk assessment application for **Sri Lanka Insurance Corpo
 
 3. **Run the server**:
    ```powershell
-   dotnet run --urls "http://localhost:5000"
+   dotnet run --urls "http://localhost:5200"
+   ```
+
+   > **Tip**: If you encounter an "Address already in use" error, try changing the port number (e.g., 5200, 5001) in the command above.
    ```
 
 4. **Access the App**:
-   Open **[http://localhost:5000](http://localhost:5000)** in your browser.
+   Open **[http://localhost:5200](http://localhost:5200)** in your browser.
 
 ---
 
