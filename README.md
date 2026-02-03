@@ -47,11 +47,12 @@ An intelligent flood risk assessment application for **Sri Lanka Insurance Corpo
 
 1. **Navigate to project directory**:
    ```powershell
-   cd d:\My_PaidProjects\floodApp
+   cd floodApp
    ```
 
 2. **Build the application**:
    ```powershell
+   dotnet restore
    dotnet build
    ```
 
@@ -59,8 +60,13 @@ An intelligent flood risk assessment application for **Sri Lanka Insurance Corpo
    ```powershell
    dotnet run --urls "http://localhost:5200"
    ```
+   > **Tip**: If you encounter an "Address already in use" error, try changing the port number.
 
-   > **Tip**: If you encounter an "Address already in use" error, try changing the port number (e.g., 5200, 5001) in the command above.
+   **For Network Access (LAN):**
+   ```powershell
+   dotnet run --urls "http://0.0.0.0:5200"
+   ```
+   *Access via your machine's IP address (e.g., http://192.168.1.50:5200)*
    ```
 
 4. **Access the App**:
