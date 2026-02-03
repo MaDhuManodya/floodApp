@@ -1,49 +1,87 @@
-# FloodApp - Sri Lanka Flood Risk Assessment
+# SLIC Flood Management System
 
-A **.NET 8 Blazor Web App** designed to help users assess flood risks in specific locations across Sri Lanka.
+An intelligent flood risk assessment application for **Sri Lanka Insurance Corporation (SLIC)**, built with **.NET 8 Blazor**. This system helps users assess flood risks for specific locations across Sri Lanka using real-time weather data and geospatial analytics.
 
-## Features
-- **🌍 Location Selection**: Cascading dropdowns for Province, District, and Town.
-- **🗺️ Interactive Maps**: Leaflet-based map integration.
-  - **Smart Navigation**: Automatically zooms to the selected Province or District.
-  - **Visual Zones**: Displays risk zones overlays.
-- **🌦️ Live Weather**: Real-time integration with **Open-Meteo API** to display current Temperature, Rain, and Wind conditions.
-- **🛡️ Risk Analysis**: Point-in-polygon calculation to determine flood risk levels (High, Medium, Low) based on GeoJSON data.
-- **🎨 Modern UI**: Dark-themed, responsive design with a custom component library.
+## 🚀 Key Features
 
-## Prerequisites
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+### 🌟 Interactive Splash Screen
+- **Minimalist Design**: Sleek dark theme (`#111827`) matching the application branding.
+- **SLIC Branding**: Official "SLIC General" logo integration.
+- **Easy Access**: Simple "click-to-enter" functionality.
 
-## How to Run
+### 🌍 Location Intelligence
+- **Cascading Selection**: Select Province -> District -> Town hierarchy.
+- **Smart Navigation**: Map automatically zooms and pans to the selected region.
+- **Detailed Data**: Covers all 9 provinces and 25 districts of Sri Lanka.
 
-1. **Navigate to the project directory**:
-   ```bash
-   cd floodApp
+### 🛡️ Risk Assessment
+- **Advanced Analytics**: Uses "Point-in-Polygon" algorithms to determine flood risk.
+- **Visual Mapping**: Interactive Leaflet map with colored risk overlays.
+- **Risk Levels**: 
+  - 🔴 **High** (Evacuation required)
+  - 🟡 **Medium** (Monitor situation)
+  - 🟢 **Low** (Safe)
+
+### 🌦️ Real-Time Weather
+- **Live Integration**: Connects to [Open-Meteo API](https://open-meteo.com/).
+- **Current Conditions**: Displays Temperature (°C), Rainfall (mm), and Wind Speed (km/h) for the specific selected coordinates.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Framework**: [.NET 8 Blazor Web App (Interactive Server)](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor)
+- **Language**: C#
+- **Map Library**: [Leaflet.js](https://leafletjs.com/) with OpenStreetMap tiles
+- **Styling**: Tailwind CSS / Custom CSS Variables
+- **Data**: GeoJSON for risk zones, JSON for location data
+
+---
+
+## 🏁 Getting Started
+
+### Prerequisites
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+
+### Installation & Run
+
+1. **Navigate to project directory**:
+   ```powershell
+   cd d:\My_PaidProjects\floodApp
    ```
 
-2. **Build the project**:
-   ```bash
+2. **Build the application**:
+   ```powershell
    dotnet build
    ```
 
-3. **Run the application**:
-   ```bash
-   dotnet watch
+3. **Run the server**:
+   ```powershell
+   dotnet run --urls "http://localhost:5000"
    ```
-   *`dotnet watch` provides hot reloading during development.*
 
 4. **Access the App**:
-   Open your browser and navigate to `http://localhost:5169`.
+   Open **[http://localhost:5000](http://localhost:5000)** in your browser.
 
-## Project Structure
-- **Pages**: Razor components acting as routable pages (`RiskLocation`, `LocationSelection`).
-- **Components**: Reusable UI (`WeatherWidget`), Map, and Location components.
-- **Services**: 
-  - `RiskService`: Calculates risk based on polygon data.
-  - `WeatherService`: Fetches live data from Open-Meteo.
-  - `LocationService`: Manages Province/District/Town data with coordinates.
-- **wwwroot**: Static assets including CSS, Leaflet JS, and GeoJSON data.
+---
 
-## Credits
-- Weather data provided by [Open-Meteo](https://open-meteo.com/).
-- Maps provided by [OpenStreetMap](https://www.openstreetmap.org/) & Leaflet.
+## 📂 Project Structure
+
+| Folder | Description |
+|--------|-------------|
+| **Pages** | Routable Razor components (`Landing`, `LocationSelection`, `RiskLocation`) |
+| **Components** | Reusable UI widgets (`WeatherWidget`, `RiskMapView`, `LocationForm`) |
+| **Services** | Business logic (`RiskService`, `WeatherService`, `LocationService`) |
+| **Models** | C# data definitions (`Province`, `RiskResult`, `WeatherResult`) |
+| **wwwroot** | Static assets (CSS, JS, Logos, GeoJSON data) |
+
+---
+
+## 📜 Credits
+
+- **Weather Data**: Open-Meteo API (Free for non-commercial use)
+- **Mapping**: OpenStreetMap & Leaflet
+- **Development**: Powered by .NET 8 Blazor
+
+---
+*Developed for Sri Lanka Insurance Corporation (SLIC)*
